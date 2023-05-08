@@ -17,7 +17,7 @@ class TestBetterLinkAPI:
         assert BetterLink.objects.count() == 1
         bl = BetterLink.objects.last()
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.json() == {'old_link': 'https://docs.djangoproject.com/en/4.2/intro/tutorial01/', 'short_link': f"http://localhost:8080/api/blsr/{bl.short_link}"}
+        assert response.json() == {'old_link': 'https://docs.djangoproject.com/en/4.2/intro/tutorial01/', 'short_link': f"http://localhost:8000/api/blsr/{bl.short_link}"}
 
         # test redirect
         response = c.get(f"/api/blsr/{bl.short_link}/")
@@ -57,7 +57,7 @@ class TestBetterLinkAPI:
             'results': [
                 {
                     'old_link': 'https://docs.djangoproject.com/en/4.2/intro/tutorial01/', 
-                    'short_link': f'http://localhost:8080/api/blsr/{last.short_link}'
+                    'short_link': f'http://localhost:8000/api/blsr/{last.short_link}'
                 }
             ]
         }

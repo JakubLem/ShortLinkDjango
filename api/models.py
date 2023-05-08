@@ -26,5 +26,5 @@ class BetterLink(models.Model):
     def view(self):
         return {
             "old_link": f"{self.get_old_long_link_proto_display()}://{self.old_link_url}",
-            "short_link": f"http://localhost:8080/api/blsr/{self.short_link}"
+            "short_link": f"http://localhost:8000/api/blsr/{self.short_link}"
         }

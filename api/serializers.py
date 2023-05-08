@@ -21,7 +21,7 @@ class BetterLinkSerializer(serializers.ModelSerializer):
         long_link = validated_data.get('long_link')
         short_link = validated_data.get('short_link')
         if not short_link:
-            short_link_length = 7
+            short_link_length = 4
             short_link = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(short_link_length))
             while BetterLink.objects.filter(short_link=short_link).exists():
                 short_link = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(short_link_length))
