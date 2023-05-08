@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from django.test.runner import DiscoverRunner
+import dj_database_url
+
+from .cfg import db
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +30,20 @@ SECRET_KEY = 'django-insecure-%9stg&t#54g9o9yyf7d(=6%p@-7a+-@b$u1vkt%mpm!&ss)zhm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["lnk-dj.herokuapp.com"]
 
+POSTGRES = os.environ.get('POSTGRES')
+
+class Postgres:
+    DATABASE_ENGINE = 'django.db.backends.postgresql'
+    DATABASE_HOST = os.environ.get('DATABASE_HOST')
+    DATABASE_PORT = os.environ.get('DATABASE_PORT')
+    DATABASE_USERNAME = os.environ.get('DATABASE_USERNAME')
+    DATABASE_PASSWORD = os.environ.get('DATABASE_PASSWORD')
+    DATABASE_DATABASE = os.environ.get('DATABASE_DATABASE')
+    DATABASE_SSLMODE = os.environ.get('DATABASE_SSLMODE')
+
+POSTGRES_INSTANCE = Postgres()
 
 # Application definition
 
@@ -75,12 +92,17 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
+MAX_CONN_AGE = 600
+DATABASES = db.get_db_cfg(POSTGRES, BASE_DIR, POSTGRES_INSTANCE)
+if "DATABASE_URL" in os.environ:
+    # Configure Django for DATABASE_URL environment variable.
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=MAX_CONN_AGE, ssl_require=True)
+
+    # Enable test database if found in CI environment.
+    if "CI" in os.environ:
+        DATABASES["default"]["TEST"] = DATABASES["default"]
 
 
 # Password validation
@@ -114,10 +136,21 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "static/"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STATIC_URL = 'static/'
+# Test Runner Config
+class HerokuDiscoverRunner(DiscoverRunner):
+    """Test Runner for Heroku CI, which provides a database for you.
+    This requires you to set the TEST database (done for you by settings().)"""
+
+    def setup_databases(self, **kwargs):
+        self.keepdb = True
+        return super(HerokuDiscoverRunner, self).setup_databases(**kwargs)  # noqa
+
+if "CI" in os.environ:
+    TEST_RUNNER = "main.settings.HerokuDiscoverRunner"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
