@@ -3,10 +3,16 @@ Django==4.2.1
 djangorestframework==3.14.0
 exceptiongroup==1.1.1
 iniconfig==2.0.0
+mccabe==0.7.0
 packaging==23.1
 pluggy==1.0.0
+pycodestyle==2.10.0
+pydocstyle==6.3.0
+pyflakes==3.0.1
+pylama==8.4.1
 pytest==7.3.1
 pytest-django==4.4.0
 pytz==2023.3
+snowballstemmer==2.2.0
 sqlparse==0.4.4
 tomli==2.0.1
