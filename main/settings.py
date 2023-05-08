@@ -150,7 +150,7 @@ class HerokuDiscoverRunner(DiscoverRunner):
         return super(HerokuDiscoverRunner, self).setup_databases(**kwargs)  # noqa
 
 if "CI" in os.environ:
-    TEST_RUNNER = "core.settings.HerokuDiscoverRunner"
+    TEST_RUNNER = "main.settings.HerokuDiscoverRunner"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
